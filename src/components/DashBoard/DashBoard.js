@@ -7,13 +7,19 @@ import createBtn from '../../assets/images/Group 10.svg';
 import TaskModal from '../TaskModal/TaskModal';
 import DeleteModal from '../DeleteModal/DeleteModal';
 import dots from '../../assets/images/dots.svg';
+import { useClipboard } from 'use-clipboard-copy';
+import { toast, ToastContainer } from 'react-toastify';
+import closeButton from '../../assets/images/closebutton.svg';
+import EditModal from '../Edit-modal/EditsModal';
+import 'react-toastify/dist/ReactToastify.css';
 
 const DashBoard = () => {
+  const clipboard = useClipboard();
   const [tasks, setTasks] = useState([]);
   const [checklistCompleted, setChecklistCompleted] = useState(0);
   const [checklist, setChecklist] = useState([]);
   const [authorization, setAuthorization] = useState(false);
-  // const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(null);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -21,14 +27,29 @@ const DashBoard = () => {
   const [filter, setFilter] = useState('Today');
   const [isMenuOpen, setIsMenuOpen] = useState(null);
   const [openTask, setOpenTask] = useState(false);
+  const [isCheck, setIsCheck] = useState([]);
+  const [editModal, setEditModal] = useState(false);
 
   const token = localStorage.getItem('authToken');
+
+  const notify = () => {
+    toast('Link Copied ✅', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
+  };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'low':
         return '#63C05B';
-      case 'medium':
+      case 'moderate':
         return '#18B0FF';
       case 'high':
         return '#FF2473';
@@ -169,6 +190,47 @@ const DashBoard = () => {
     }
   };
 
+  const isShareAPISupported = () => {
+    return navigator.share !== undefined;
+  };
+
+  const handleShare = async (url) => {
+    if (isShareAPISupported()) {
+      try {
+        await navigator.share({
+          title: 'Task',
+          url: url,
+        });
+      } catch (error) {
+        console.error('An error occurred while sharing the task:', error);
+      }
+    } else {
+      notify();
+      clipboard(url);
+    }
+  };
+
+  const handleCheck = async (taskId, checklistId) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      };
+      await axios.put(
+        `http://localhost:5000/api/tasks/${taskId}/checklists/${checklistId}`,
+        { ischeck: !isCheck.ischeck },
+        config
+      );
+      setIsCheck((prevState) => {
+        return { ...prevState, ischeck: !prevState.ischeck };
+      });
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   const greetings = `Welcome!  ${localStorage.getItem('Name')}`;
 
   return (
@@ -198,7 +260,12 @@ const DashBoard = () => {
           <div className={styles.DashBoardContainer2}>
             <div className={styles.TaskBoard}>
               <div className={styles.Task}>
-                <h3>Backlog</h3>
+                <div className={styles.create}>
+                  <h3>Backlog</h3>
+                  <button>
+                    <img src={closeButton} alt="closebtn" />
+                  </button>
+                </div>
                 <div className={styles.TaskContainer}>
                   {tasks
                     .filter((task) => task.state === 'backlog')
@@ -238,8 +305,18 @@ const DashBoard = () => {
                             id="myDropdown"
                             className={styles.dropdownContent}
                           >
-                            <button>Edit</button>
-                            <button>Share</button>
+                            <button onClick={() => setEditModal(true)}>
+                              Edit
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleShare(
+                                  `http://localhost:3000/task/${task._id}`
+                                )
+                              }
+                            >
+                              Share
+                            </button>
                             <button
                               style={{ color: '#CF3636' }}
                               onClick={(e) => setDeleteModal(true)}
@@ -269,7 +346,9 @@ const DashBoard = () => {
                                 <input
                                   type="checkbox"
                                   checked={item.ischeck}
-                                  onChange={(e) => handleChecklistChange(index)}
+                                  onChange={() =>
+                                    handleCheck(task._id, item._id)
+                                  }
                                   className={styles.Checklist}
                                 />
                                 {item.text}
@@ -323,9 +402,14 @@ const DashBoard = () => {
               <div className={styles.Task}>
                 <div className={styles.create}>
                   <h3>To do</h3>
-                  <button onClick={() => setOpenModal(true)}>
-                    <img src={createBtn} alt="btn" />
-                  </button>
+                  <div className={styles.createClose}>
+                    <button onClick={() => setOpenModal(true)}>
+                      <img src={createBtn} alt="btn" />
+                    </button>
+                    <button>
+                      <img src={closeButton} alt="closebtn" />
+                    </button>
+                  </div>
                 </div>
                 <div className={styles.TaskContainer}>
                   {tasks
@@ -367,7 +451,15 @@ const DashBoard = () => {
                             className={styles.dropdownContent}
                           >
                             <button>Edit</button>
-                            <button>Share</button>
+                            <button
+                              onClick={() =>
+                                handleShare(
+                                  `http://localhost:3000/task/${task._id}`
+                                )
+                              }
+                            >
+                              Share
+                            </button>
                             <button
                               style={{ color: '#CF3636' }}
                               onClick={(e) => setDeleteModal(true)}
@@ -385,29 +477,30 @@ const DashBoard = () => {
 
                           <button
                             className={styles.dropdown}
-                            onClick={(e) => handleMenuClick(task._id)}
+                            onClick={(e) => handleDropDown(task._id)}
                             key={task._id}
                           >
                             <img src={down} alt="down" />
                           </button>
                         </div>
-                        {openTask === task._id && (
-                          <ul>
-                            {task.checklist?.map((item, index) => (
-                              <li key={item._id}>
-                                <input
-                                  type="checkbox"
-                                  checked={item.ischeck}
-                                  onChange={(e) =>
-                                    handleChecklistChange(index._id)
-                                  }
-                                  className={styles.Checklist}
-                                />
-                                {item.text}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                        {isOpen ||
+                          (openTask === task._id && (
+                            <ul>
+                              {task.checklist?.map((item, index) => (
+                                <li key={item._id}>
+                                  <input
+                                    type="checkbox"
+                                    checked={item.ischeck}
+                                    onChange={(e) =>
+                                      handleChecklistChange(index._id)
+                                    }
+                                    className={styles.Checklist}
+                                  />
+                                  {item.text}
+                                </li>
+                              ))}
+                            </ul>
+                          ))}
                         <div className={styles.Track}>
                           <div
                             className={styles.dueDate}
@@ -453,7 +546,12 @@ const DashBoard = () => {
                 </div>
               </div>
               <div className={styles.Task}>
-                <h3>In progress</h3>
+                <div className={styles.create}>
+                  <h3>In progress</h3>
+                  <button>
+                    <img src={closeButton} alt="closebtn" />
+                  </button>
+                </div>
                 <div className={styles.TaskContainer}>
                   {tasks
                     .filter((task) => task.state === 'in-progress')
@@ -494,7 +592,15 @@ const DashBoard = () => {
                             className={styles.dropdownContent}
                           >
                             <button>Edit</button>
-                            <button>Share</button>
+                            <button
+                              onClick={() =>
+                                handleShare(
+                                  `http://localhost:3000/task/${task._id}`
+                                )
+                              }
+                            >
+                              Share
+                            </button>
                             <button
                               style={{ color: '#CF3636' }}
                               onClick={(e) => setDeleteModal(true)}
@@ -512,7 +618,7 @@ const DashBoard = () => {
 
                           <button
                             className={styles.dropdown}
-                            onClick={(e) => handleMenuClick(task._id)}
+                            onClick={(e) => handleDropDown(task._id)}
                             key={task._id}
                           >
                             <img src={down} alt="down" />
@@ -573,7 +679,12 @@ const DashBoard = () => {
                 </div>
               </div>
               <div className={styles.Task}>
-                <h3>Done</h3>
+                <div className={styles.create}>
+                  <h3>Done</h3>
+                  <button>
+                    <img src={closeButton} alt="closebtn" />
+                  </button>
+                </div>
                 <div className={styles.TaskContainer}>
                   {tasks
                     .filter((task) => task.state === 'done')
@@ -614,7 +725,15 @@ const DashBoard = () => {
                             className={styles.dropdownContent}
                           >
                             <button>Edit</button>
-                            <button>Share</button>
+                            <button
+                              onClick={() =>
+                                handleShare(
+                                  `http://localhost:3000/task/${task._id}`
+                                )
+                              }
+                            >
+                              Share
+                            </button>
                             <button
                               style={{ color: '#CF3636' }}
                               onClick={(e) => setDeleteModal(true)}
@@ -632,7 +751,7 @@ const DashBoard = () => {
 
                           <button
                             className={styles.dropdown}
-                            onClick={(e) => handleMenuClick(task._id)}
+                            onClick={(e) => handleDropDown(task._id)}
                             key={task._id}
                           >
                             <img src={down} alt="down" />
@@ -705,6 +824,17 @@ const DashBoard = () => {
             <DeleteModal
               key={task._id}
               closeModal={setDeleteModal}
+              taskId={task._id}
+            />
+          )
+      )}
+      <ToastContainer />
+      {tasks.map(
+        (task) =>
+          editModal && (
+            <EditModal
+              key={task._id}
+              closeModal={setEditModal}
               taskId={task._id}
             />
           )

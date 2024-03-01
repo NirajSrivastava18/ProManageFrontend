@@ -265,6 +265,10 @@
   width: 20%;
 }
 
+.createClose {
+  margin-top: 20px;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }

@@ -17,7 +17,7 @@ const TaskPage = () => {
     switch (priority) {
       case 'low':
         return '#63C05B';
-      case 'medium':
+      case 'moderate':
         return '#18B0FF';
       case 'high':
         return '#FF2473';

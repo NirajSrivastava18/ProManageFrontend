@@ -1,38 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import styles from './TaskModal.module.css';
+import styles from './editModal.module.css';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Delete from '../../assets/images/Delete.svg';
 
-const TaskModal = ({ closeModal }) => {
+const EditsModal = ({ closeModal, taskId }) => {
+  const [tasks, setTasks] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     priority: 'low',
     dueDate: new Date(),
     user: localStorage.getItem('id'),
-    checklist: [{ text: '', ischecked: false }],
+    checklist: [],
     state: 'todo',
   });
   const [errors, setErrors] = useState({});
-  const { title, dueDate, priority, checklist } = formData;
 
-  const [values, setValues] = useState([{ text: '', ischecked: false }]);
+  useEffect(() => {
+    const res = axios.get(`http://localhost:5000/api/gettaskbyid/${taskId}`);
+    setTasks(res.data);
+    setFormData(res.data);
+  }, [setTasks, taskId]);
 
   const handleChange = (e, i) => {
     if (i !== undefined) {
-      const newValues = [...values];
+      const newValues = [...formData.checklist];
       newValues[i].text = e.target.value;
       newValues[i].ischecked = e.target.checked ? 'true' : 'false';
       newValues[i].priority = e.target.value;
-      setValues(newValues);
+      setFormData({ ...formData, checklist: newValues });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     try {
       const config = {
         headers: {
@@ -40,9 +43,9 @@ const TaskModal = ({ closeModal }) => {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         },
       };
-      const response = await axios.post(
-        'http://localhost:5000/api/createtask',
-        { ...formData, checklist: values },
+      const response = await axios.put(
+        `http://localhost:5000/api/edit-task/${taskId}`,
+        formData,
         config
       );
       console.log(response.data);
@@ -58,30 +61,31 @@ const TaskModal = ({ closeModal }) => {
   };
 
   const handleDelete = (i) => {
-    const newValues = [...values];
+    const newValues = [...formData.checklist];
     newValues.splice(i, 1);
-    setValues(newValues);
+    setFormData({ ...formData, checklist: newValues });
   };
 
   const handleAdd = () => {
-    setValues([...values, { text: '', ischecked: false }]);
+    setFormData({
+      ...formData,
+      checklist: [...formData.checklist, { text: '', ischecked: false }],
+    });
   };
-
   return (
     <>
       <div className={styles.modalBackground}>
         <div className={styles.modalContainer}>
-          <form className={styles.modal}>
+          {/* <form className={styles.modal}>
             <label className={styles.star}>Title</label>
             <input
               type="text"
               name="title"
               placeholder="Enter Task title"
-              value={title}
+              value={formData.title}
               onChange={handleChange}
               required
             />
-
             <div className={styles.Priorty}>
               <label className={styles.star}> Select Priority</label>
               <button
@@ -89,6 +93,7 @@ const TaskModal = ({ closeModal }) => {
                 name="priority"
                 onClick={(e) => handleChange(e)}
                 type="button"
+                className={formData.priority === 'high' ? styles.active : ''}
               >
                 HIGH PRIORITY
               </button>
@@ -97,27 +102,32 @@ const TaskModal = ({ closeModal }) => {
                 name="priority"
                 onClick={(e) => handleChange(e)}
                 type="button"
+                className={
+                  formData.priority === 'moderate' ? styles.active : ''
+                }
               >
                 MODERATE PRIORITY
-              </button>
+              </button>{' '}
               <button
                 value="low"
                 name="priority"
                 onClick={(e) => handleChange(e)}
                 type="button"
+                className={formData.priority === 'low' ? styles.active : ''}
               >
-                LOW PRIORITY
-              </button>
+                {' '}
+                LOW PRIORITY{' '}
+              </button>{' '}
             </div>
 
             <h4 className={styles.star}>checklist (/)</h4>
-            {values.map((val, i) => (
+            {formData.checklist?.map((val, i) => (
               <div className={styles.addTaskcontainer} key={i}>
                 <div className={styles.TaskInput}>
                   <input
                     type="checkbox"
                     name="ischecked"
-                    checked={val.ischecked}
+                    checked={val.ischecked === 'true'}
                     value={val.ischecked}
                     className={styles.addTaskCheckbox}
                     onChange={(e) => handleChange(e, i)}
@@ -147,12 +157,11 @@ const TaskModal = ({ closeModal }) => {
             <button className={styles.addButton} onClick={handleAdd}>
               + Add New
             </button>
-
             <div className={styles.footer}>
               <div>
                 <label htmlFor="dueDate"></label>
                 <DatePicker
-                  selected={dueDate}
+                  selected={formData.dueDate}
                   onChange={(date) =>
                     handleChange({ target: { name: 'dueDate', value: date } })
                   }
@@ -178,11 +187,21 @@ const TaskModal = ({ closeModal }) => {
                 </button>
               </div>
             </div>
-          </form>
+          </form> */}
+          <p> Under process</p>
+          <button
+            className={styles.cancel}
+            type="button"
+            onClick={() => {
+              closeModal(false);
+            }}
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </>
   );
 };
 
-export default TaskModal;
+export default EditsModal;

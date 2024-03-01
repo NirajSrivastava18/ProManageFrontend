@@ -52,14 +52,14 @@ const Analytics = () => {
   const getPriorityCounts = () => {
     const priorityCounts = {
       low: 0,
-      medium: 0,
+      moderate: 0,
       high: 0,
     };
     task.forEach((task) => {
       if (task.priority === 'low') {
         priorityCounts.low++;
-      } else if (task.priority === 'medium') {
-        priorityCounts.medium++;
+      } else if (task.priority === 'moderate') {
+        priorityCounts.moderate++;
       } else if (task.priority === 'high') {
         priorityCounts.high++;
       }
