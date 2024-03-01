@@ -15,7 +15,7 @@ const Analytics = () => {
         },
       };
       const res = await axios.get(
-        'http://localhost:5000/api/getalltask',
+        'https://promanagebackend.onrender.com/api/getalltask',
         config
       );
       setTask(res.data);

@@ -87,7 +87,7 @@ const DashBoard = () => {
     };
     console.log(config);
     axios
-      .get('http://localhost:5000/api/getalltask', config)
+      .get('https://promanagebackend.onrender.com/api/getalltask', config)
       .then((res) => {
         setTasks(res.data);
         setChecklist(
@@ -110,7 +110,7 @@ const DashBoard = () => {
       };
       await axios
         .put(
-          `http://localhost:5000/api/update-state/${taskid}`,
+          `https://promanagebackend.onrender.com/api/update-state/${taskid}`,
           {
             state: newState,
           },
@@ -166,7 +166,10 @@ const DashBoard = () => {
     };
     console.log(config);
     axios
-      .get(`http://localhost:5000/api/get-filter?filter=${newFilter}`, config)
+      .get(
+        `https://promanagebackend.onrender.com/api/get-filter?filter=${newFilter}`,
+        config
+      )
       .then((res) => {
         console.log(res.data);
         setTasks(res.data);
@@ -219,7 +222,7 @@ const DashBoard = () => {
         },
       };
       await axios.put(
-        `http://localhost:5000/api/tasks/${taskId}/checklists/${checklistId}`,
+        `https://promanagebackend.onrender.com/api/tasks/${taskId}/checklists/${checklistId}`,
         { ischeck: !isCheck.ischeck },
         config
       );

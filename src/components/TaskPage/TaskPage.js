@@ -49,7 +49,7 @@ const TaskPage = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/gettaskbyid/${id}`,
+          `https://promanagebackend.onrender.com/api/gettaskbyid/${id}`,
           config
         );
 

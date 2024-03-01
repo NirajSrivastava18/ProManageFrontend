@@ -57,7 +57,7 @@ const Settings = () => {
           body: JSON.stringify(userDetails),
         };
         const data = axios.put(
-          'http://localhost:5000/api/update-password',
+          'https://promanagebackend.onrender.com/api/update-password',
           userDetails,
           config
         );

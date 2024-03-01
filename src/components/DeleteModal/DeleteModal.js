@@ -13,7 +13,10 @@ const DeleteModal = ({ closeModal, taskId }) => {
   const handleDelete = async () => {
     try {
       await axios
-        .delete(`http://localhost:5000/api/delete-task/${taskId}`, config)
+        .delete(
+          `https://promanagebackend.onrender.com/api/delete-task/${taskId}`,
+          config
+        )
         .then((response) => {
           console.log('task deleted successfully');
           console.log(response.data);
