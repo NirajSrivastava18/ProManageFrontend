@@ -13,7 +13,6 @@ function Modal({ closeModal }) {
   return (
     <div className={styles.modalBackground}>
       <div className={styles.modalContainer}>
-        <div className={styles.titleCloseBtn}></div>
         <div className={styles.title}>
           <h1>Are You Sure You Want to Logout</h1>
         </div>

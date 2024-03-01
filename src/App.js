@@ -6,6 +6,7 @@ import SideNav from './pages/SideNav';
 import Dashboard from './pages/dashboard';
 import Settings from './pages/settings';
 import Analytics from './pages/analytics';
+import TaskPage from './pages/TaskPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/task/:id" element={<TaskPage />} />
         </Routes>
       </BrowserRouter>
     </>
