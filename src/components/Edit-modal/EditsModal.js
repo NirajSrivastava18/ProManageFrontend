@@ -166,43 +166,45 @@ const EditsModal = ({ closeModal, taskId }) => {
               </button>{' '}
             </div>
 
-            <h4 className={styles.star}>checklist (/)</h4>
-            {formData.checklist?.map((val, i) => (
-              <div className={styles.addTaskcontainer} key={i}>
-                <div className={styles.TaskInput}>
-                  <input
-                    type="checkbox"
-                    name="ischecked"
-                    checked={val.ischecked}
-                    value={val.ischecked}
-                    className={styles.addTaskCheckbox}
-                    onChange={(e) => handleChange(e, i)}
-                  />
-                  <input
-                    type="text"
-                    name="text"
-                    value={val.text}
-                    onChange={(e) => handleChange(e, i)}
-                    placeholder="Add a task"
-                    className={styles.addTaskTitle}
-                  />
+            {/* <h4 className={styles.star}>checklist (/)</h4> */}
+            <div className={styles.AddArea}>
+              {formData.checklist?.map((val, i) => (
+                <div className={styles.addTaskcontainer} key={i}>
+                  <div className={styles.TaskInput}>
+                    <input
+                      type="checkbox"
+                      name="ischecked"
+                      checked={val.ischecked}
+                      value={val.ischecked}
+                      className={styles.addTaskCheckbox}
+                      onChange={(e) => handleChange(e, i)}
+                    />
+                    <input
+                      type="text"
+                      name="text"
+                      value={val.text}
+                      onChange={(e) => handleChange(e, i)}
+                      placeholder="Add a task"
+                      className={styles.addTaskTitle}
+                    />
+                  </div>
+                  <button
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      marginRight: '10px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={(e) => handleDelete(e, i)}
+                  >
+                    <img src={Delete} alt="Delete" />
+                  </button>
                 </div>
-                <button
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    marginRight: '10px',
-                    cursor: 'pointer',
-                  }}
-                  onClick={(e) => handleDelete(e, i)}
-                >
-                  <img src={Delete} alt="Delete" />
-                </button>
-              </div>
-            ))}
-            <button className={styles.addButton} onClick={handleAdd}>
-              + Add New
-            </button>
+              ))}
+              <button className={styles.addButton} onClick={handleAdd}>
+                + Add New
+              </button>
+            </div>
             <div className={styles.footer}>
               <div>
                 <label htmlFor="dueDate"></label>

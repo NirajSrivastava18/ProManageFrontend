@@ -57,13 +57,15 @@ const TaskModal = ({ closeModal }) => {
     }
   };
 
-  const handleDelete = (i) => {
+  const handleDelete = (e, i) => {
+    e.preventDefault();
     const newValues = [...values];
     newValues.splice(i, 1);
     setValues(newValues);
   };
 
-  const handleAdd = () => {
+  const handleAdd = (e) => {
+    e.preventDefault();
     setValues([...values, { text: '', ischecked: false }]);
   };
 
@@ -110,43 +112,45 @@ const TaskModal = ({ closeModal }) => {
               </button>
             </div>
 
-            <h4 className={styles.star}>checklist (/)</h4>
-            {values.map((val, i) => (
-              <div className={styles.addTaskcontainer} key={i}>
-                <div className={styles.TaskInput}>
-                  <input
-                    type="checkbox"
-                    name="ischecked"
-                    checked={val.ischecked}
-                    value={val.ischecked}
-                    className={styles.addTaskCheckbox}
-                    onChange={(e) => handleChange(e, i)}
-                  />
-                  <input
-                    type="text"
-                    name="text"
-                    value={val.text}
-                    onChange={(e) => handleChange(e, i)}
-                    placeholder="Add a task"
-                    className={styles.addTaskTitle}
-                  />
+            {/* <h4 className={styles.star}>checklist (0/0)</h4> */}
+            <div className={styles.addArea}>
+              {values.map((val, i) => (
+                <div className={styles.addTaskcontainer} key={i}>
+                  <div className={styles.TaskInput}>
+                    <input
+                      type="checkbox"
+                      name="ischecked"
+                      checked={val.ischecked}
+                      value={val.ischecked}
+                      className={styles.addTaskCheckbox}
+                      onChange={(e) => handleChange(e, i)}
+                    />
+                    <input
+                      type="text"
+                      name="text"
+                      value={val.text}
+                      onChange={(e) => handleChange(e, i)}
+                      placeholder="Add a task"
+                      className={styles.addTaskTitle}
+                    />
+                  </div>
+                  <button
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      marginRight: '10px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={(e) => handleDelete(e, i)}
+                  >
+                    <img src={Delete} alt="Delete" />
+                  </button>
                 </div>
-                <button
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    marginRight: '10px',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => handleDelete(i)}
-                >
-                  <img src={Delete} alt="Delete" />
-                </button>
-              </div>
-            ))}
-            <button className={styles.addButton} onClick={handleAdd}>
-              + Add New
-            </button>
+              ))}
+              <button className={styles.addButton} onClick={handleAdd}>
+                + Add New
+              </button>
+            </div>
 
             <div className={styles.footer}>
               <div>

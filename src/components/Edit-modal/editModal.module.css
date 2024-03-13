@@ -111,6 +111,10 @@
   letter-spacing: 0em;
   color: #767575;
 }
+.addArea {
+  overflow-y: scroll;
+  height: 50vh;
+}
 .addTaskcontainer {
   width: 96.9%;
   height: 45px;
