@@ -57,12 +57,16 @@ const TaskModal = ({ closeModal }) => {
     }
   };
 
-  const handleDelete = (i) => {
-    const newValues = [...values];
-    newValues.splice(i, 1);
-    setValues(newValues);
+  const handleDelete = (e, index) => {
+    e.preventDefault();
+    const newChecklist = [...formData.checklist];
+    newChecklist.splice(index, 1);
+    const newFormData = {
+      ...formData,
+      checklist: newChecklist,
+    };
+    setFormData(newFormData);
   };
-
   const handleAdd = (e) => {
     e.preventDefault();
     setFormData((prevFormData) => ({
