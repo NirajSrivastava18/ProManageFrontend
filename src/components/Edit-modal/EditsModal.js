@@ -83,7 +83,8 @@ const EditsModal = ({ closeModal, taskId }) => {
     }
   };
 
-  const handleDelete = (index) => {
+  const handleDelete = (e, index) => {
+    e.preventDefault();
     const newChecklist = [...formData.checklist];
     newChecklist.splice(index, 1);
     const newFormData = {
