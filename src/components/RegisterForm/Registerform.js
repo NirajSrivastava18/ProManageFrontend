@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from './RegisterForm.module.css';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useNavigate } from 'react-router-dom';
 import {
   faEnvelope,
   faLock,
@@ -11,6 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const Registerform = () => {
+  const navigate = useNavigate();
   const [userDetails, setUserDetails] = useState({
     Name: '',
     email: '',
@@ -67,6 +69,7 @@ const Registerform = () => {
           localStorage.setItem('authtoken', JSON.stringify(data.data.jwttoken));
           localStorage.setItem('Name', JSON.stringify(data.data.Name));
           console.log('User created successfully');
+          navigate('/login');
         }
       } catch (error) {
         console.log('something went wrong!');
