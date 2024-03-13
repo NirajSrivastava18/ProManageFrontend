@@ -63,8 +63,12 @@ const TaskModal = ({ closeModal }) => {
     setValues(newValues);
   };
 
-  const handleAdd = () => {
-    setValues([...values, { text: '', ischecked: false }]);
+  const handleAdd = (e) => {
+    e.preventDefault();
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      checklist: [...prevFormData.checklist, { text: '', ischecked: false }],
+    }));
   };
 
   return (
