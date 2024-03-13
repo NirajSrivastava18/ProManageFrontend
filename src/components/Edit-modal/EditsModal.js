@@ -194,7 +194,7 @@ const EditsModal = ({ closeModal, taskId }) => {
                     marginRight: '10px',
                     cursor: 'pointer',
                   }}
-                  onClick={() => handleDelete(i)}
+                  onClick={(e) => handleDelete(e, i)}
                 >
                   <img src={Delete} alt="Delete" />
                 </button>

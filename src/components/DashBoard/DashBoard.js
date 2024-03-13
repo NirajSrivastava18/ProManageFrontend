@@ -219,6 +219,15 @@ const DashBoard = () => {
     );
   };
 
+  const handleEditClick = (taskId) => {
+    setSelectedTaskId(taskId);
+    setEditModal(true);
+  };
+
+  const handleDeleteClick = (taskId) => {
+    setSelectedTaskId(taskId);
+    setDeleteModal(true);
+  };
   const greetings = `Welcome!  ${localStorage.getItem('Name')}`;
 
   return (
@@ -293,7 +302,7 @@ const DashBoard = () => {
                             id="myDropdown"
                             className={styles.dropdownContent}
                           >
-                            <button onClick={() => setEditModal(true)}>
+                            <button onClick={() => handleEditClick(task._id)}>
                               Edit
                             </button>
                             <button
@@ -307,7 +316,7 @@ const DashBoard = () => {
                             </button>
                             <button
                               style={{ color: '#CF3636' }}
-                              onClick={(e) => setDeleteModal(true)}
+                              onClick={() => handleDeleteClick(task._id)}
                             >
                               Delete
                             </button>
@@ -438,7 +447,9 @@ const DashBoard = () => {
                             id="myDropdown"
                             className={styles.dropdownContent}
                           >
-                            <button>Edit</button>
+                            <button onClick={() => handleEditClick(task._id)}>
+                              Edit
+                            </button>
                             <button
                               onClick={() =>
                                 handleShare(
@@ -450,7 +461,7 @@ const DashBoard = () => {
                             </button>
                             <button
                               style={{ color: '#CF3636' }}
-                              onClick={(e) => setDeleteModal(true)}
+                              onClick={() => handleDeleteClick(task._id)}
                             >
                               Delete
                             </button>
@@ -579,7 +590,9 @@ const DashBoard = () => {
                             id="myDropdown"
                             className={styles.dropdownContent}
                           >
-                            <button>Edit</button>
+                            <button onClick={() => handleEditClick(task._id)}>
+                              Edit
+                            </button>
                             <button
                               onClick={() =>
                                 handleShare(
@@ -591,7 +604,7 @@ const DashBoard = () => {
                             </button>
                             <button
                               style={{ color: '#CF3636' }}
-                              onClick={(e) => setDeleteModal(true)}
+                              onClick={() => handleDeleteClick(task._id)}
                             >
                               Delete
                             </button>
@@ -714,7 +727,9 @@ const DashBoard = () => {
                             id="myDropdown"
                             className={styles.dropdownContent}
                           >
-                            <button>Edit</button>
+                            <button onClick={() => handleEditClick(task._id)}>
+                              Edit
+                            </button>
                             <button
                               onClick={() =>
                                 handleShare(
@@ -726,7 +741,7 @@ const DashBoard = () => {
                             </button>
                             <button
                               style={{ color: '#CF3636' }}
-                              onClick={(e) => setDeleteModal(true)}
+                              onClick={() => handleDeleteClick(task._id)}
                             >
                               Delete
                             </button>
@@ -816,7 +831,7 @@ const DashBoard = () => {
             <DeleteModal
               key={task._id}
               closeModal={setDeleteModal}
-              taskId={task._id}
+              taskId={selectedTaskId}
             />
           )
       )}
@@ -827,7 +842,7 @@ const DashBoard = () => {
             <EditModal
               key={task._id}
               closeModal={setEditModal}
-              taskId={task._id}
+              taskId={selectedTaskId}
             />
           )
       )}

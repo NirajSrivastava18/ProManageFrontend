@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from './DeleteModal.module.css';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
 
 const DeleteModal = ({ closeModal, taskId }) => {
   const config = {
