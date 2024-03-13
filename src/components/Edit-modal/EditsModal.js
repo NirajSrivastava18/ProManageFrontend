@@ -21,7 +21,7 @@ const EditsModal = ({ closeModal, taskId }) => {
     const fetchTask = async () => {
       try {
         const res = await axios.get(
-          `hhttps://promanagebackend.onrender.com/api/gettaskbyid/${taskId}`
+          `https://promanagebackend.onrender.com/api/gettaskbyid/${taskId}`
         );
         setTasks(res.data);
         setFormData(res.data);
