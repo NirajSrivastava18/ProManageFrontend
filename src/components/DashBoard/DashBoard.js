@@ -29,6 +29,7 @@ const DashBoard = () => {
   const [openTask, setOpenTask] = useState(false);
   const [isCheck, setIsCheck] = useState([]);
   const [editModal, setEditModal] = useState(false);
+  const [checklistCompletion, setChecklistCompletion] = useState();
 
   const token = localStorage.getItem('authToken');
 
@@ -126,35 +127,6 @@ const DashBoard = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (!selectedTaskId) {
-  //     return;
-  //   }
-
-  //   const selectedTask = tasks.find((task) => task._id === selectedTaskId);
-
-  //   if (!selectedTask) {
-  //     return;
-  //   }
-
-  //   let completed = 0;
-
-  //   selectedTask.checklist.forEach((item) => {
-  //     if (item.ischeck === true) {
-  //       completed++;
-  //     }
-  //   });
-
-  //   console.log('selectedTask:', selectedTask);
-  //   console.log('completed:', completed);
-  //   setChecklistCompleted(completed);
-  // }, [selectedTaskId, tasks]);
-
-  const handleChecklistChange = (index) => {
-    const newChecklist = [...checklist];
-    newChecklist[index].ischeck = !newChecklist[index].ischeck;
-    setChecklist(newChecklist);
-  };
   const handleFitlerChange = (e) => {
     const newFilter = e.target.value;
     setFilter(newFilter);
@@ -229,9 +201,22 @@ const DashBoard = () => {
       setIsCheck((prevState) => {
         return { ...prevState, ischeck: !prevState.ischeck };
       });
+      console.log(isCheck);
     } catch (err) {
       console.log(err.message);
     }
+  };
+
+  useEffect(() => {
+    console.log(isCheck);
+  }, [isCheck]);
+
+  const completed = (taskId) => {
+    const task = tasks.find((t) => t._id === taskId);
+    return (
+      task?.checklist?.reduce((acc, checklist) => acc + checklist.ischeck, 0) ||
+      0
+    );
   };
 
   const greetings = `Welcome!  ${localStorage.getItem('Name')}`;
@@ -331,7 +316,7 @@ const DashBoard = () => {
                         <h3>{task.title}</h3>
                         <div className={styles.TaskCheckList}>
                           <h4>
-                            checklist ({checklistCompleted}/
+                            checklist ({completed(task._id)}/
                             {task.checklist?.length || 0})
                           </h4>
 
@@ -349,7 +334,7 @@ const DashBoard = () => {
                                 <input
                                   type="checkbox"
                                   checked={item.ischeck}
-                                  onChange={() =>
+                                  onChange={(e) =>
                                     handleCheck(task._id, item._id)
                                   }
                                   className={styles.Checklist}
@@ -474,7 +459,7 @@ const DashBoard = () => {
                         <h3>{task.title}</h3>
                         <div className={styles.TaskCheckList}>
                           <h4>
-                            checklist ({checklistCompleted}/
+                            checklist ({completed(task._id)}/
                             {task.checklist?.length || 0})
                           </h4>
 
@@ -495,7 +480,7 @@ const DashBoard = () => {
                                     type="checkbox"
                                     checked={item.ischeck}
                                     onChange={(e) =>
-                                      handleChecklistChange(index._id)
+                                      handleCheck(task._id, item._id)
                                     }
                                     className={styles.Checklist}
                                   />
@@ -615,7 +600,7 @@ const DashBoard = () => {
                         <h3>{task.title}</h3>
                         <div className={styles.TaskCheckList}>
                           <h4>
-                            checklist ({checklistCompleted}/
+                            checklist ({completed(task._id)}/
                             {task.checklist?.length || 0})
                           </h4>
 
@@ -634,7 +619,9 @@ const DashBoard = () => {
                                 <input
                                   type="checkbox"
                                   checked={item.ischeck}
-                                  onChange={(e) => handleChecklistChange(index)}
+                                  onChange={(e) =>
+                                    handleCheck(task._id, item._id)
+                                  }
                                   className={styles.Checklist}
                                 />
                                 {item.text}
@@ -748,7 +735,7 @@ const DashBoard = () => {
                         <h3>{task.title}</h3>
                         <div className={styles.TaskCheckList}>
                           <h4>
-                            checklist ({checklistCompleted}/
+                            checklist ({completed(task._id)}/
                             {task.checklist?.length || 0})
                           </h4>
 
@@ -767,7 +754,9 @@ const DashBoard = () => {
                                 <input
                                   type="checkbox"
                                   checked={item.ischeck}
-                                  onChange={(e) => handleChecklistChange(index)}
+                                  onChange={(e) =>
+                                    handleCheck(task._id, item._id)
+                                  }
                                   className={styles.Checklist}
                                 />
                                 {item.text}

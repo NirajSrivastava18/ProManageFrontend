@@ -6,29 +6,44 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Delete from '../../assets/images/Delete.svg';
 
 const EditsModal = ({ closeModal, taskId }) => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     priority: 'low',
     dueDate: new Date(),
     user: localStorage.getItem('id'),
-    checklist: [],
+    checklist: [{ text: '', ischecked: false }],
     state: 'todo',
   });
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const res = axios.get(`http://localhost:5000/api/gettaskbyid/${taskId}`);
-    setTasks(res.data);
-    setFormData(res.data);
+    const fetchTask = async () => {
+      try {
+        const res = await axios.get(
+          `hhttps://promanagebackend.onrender.com/api/gettaskbyid/${taskId}`
+        );
+        setTasks(res.data);
+        setFormData(res.data);
+      } catch (error) {
+        console.error('Error fetching task:', error);
+      }
+    };
+
+    if (taskId) {
+      fetchTask();
+    }
   }, [setTasks, taskId]);
 
   const handleChange = (e, i) => {
     if (i !== undefined) {
       const newValues = [...formData.checklist];
-      newValues[i].text = e.target.value;
-      newValues[i].ischecked = e.target.checked ? 'true' : 'false';
-      newValues[i].priority = e.target.value;
+      newValues[i] = {
+        ...newValues[i],
+        text: e.target.value,
+        ischecked: e.target.checked,
+        priority: e.target.value,
+      };
       setFormData({ ...formData, checklist: newValues });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,8 +58,16 @@ const EditsModal = ({ closeModal, taskId }) => {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         },
       };
+
+      // Validate formData before sending the request
+      const errors = validateFormData(formData);
+      if (Object.keys(errors).length > 0) {
+        setErrors(errors);
+        return;
+      }
+
       const response = await axios.put(
-        `http://localhost:5000/api/edit-task/${taskId}`,
+        `https://promanagebackend.onrender.com/api/edit-task/${taskId}`,
         formData,
         config
       );
@@ -66,17 +89,33 @@ const EditsModal = ({ closeModal, taskId }) => {
     setFormData({ ...formData, checklist: newValues });
   };
 
-  const handleAdd = () => {
-    setFormData({
-      ...formData,
-      checklist: [...formData.checklist, { text: '', ischecked: false }],
-    });
+  const handleAdd = (e) => {
+    e.preventDefault();
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      checklist: [...prevFormData.checklist, { text: '', ischecked: false }],
+    }));
   };
+  // Add validation function
+  const validateFormData = (data) => {
+    const errors = {};
+
+    if (!data.title) {
+      errors.title = 'Title is required';
+    }
+
+    if (!data.dueDate) {
+      errors.dueDate = 'Due date is required';
+    }
+
+    return errors;
+  };
+
   return (
     <>
       <div className={styles.modalBackground}>
         <div className={styles.modalContainer}>
-          {/* <form className={styles.modal}>
+          <form className={styles.modal}>
             <label className={styles.star}>Title</label>
             <input
               type="text"
@@ -86,6 +125,8 @@ const EditsModal = ({ closeModal, taskId }) => {
               onChange={handleChange}
               required
             />
+            {errors.title && <p className={styles.error}>{errors.title}</p>}
+
             <div className={styles.Priorty}>
               <label className={styles.star}> Select Priority</label>
               <button
@@ -127,7 +168,7 @@ const EditsModal = ({ closeModal, taskId }) => {
                   <input
                     type="checkbox"
                     name="ischecked"
-                    checked={val.ischecked === 'true'}
+                    checked={val.ischecked}
                     value={val.ischecked}
                     className={styles.addTaskCheckbox}
                     onChange={(e) => handleChange(e, i)}
@@ -167,6 +208,9 @@ const EditsModal = ({ closeModal, taskId }) => {
                   }
                   required
                 />
+                {errors.dueDate && (
+                  <p className={styles.error}>{errors.dueDate}</p>
+                )}
               </div>
               <div className={styles.btns}>
                 <button
@@ -187,9 +231,9 @@ const EditsModal = ({ closeModal, taskId }) => {
                 </button>
               </div>
             </div>
-          </form> */}
-          <p> Under process</p>
-          <button
+          </form>
+          {/* <p> Under process</p> */}
+          {/* <button
             className={styles.cancel}
             type="button"
             onClick={() => {
@@ -197,7 +241,7 @@ const EditsModal = ({ closeModal, taskId }) => {
             }}
           >
             Cancel
-          </button>
+          </button> */}
         </div>
       </div>
     </>

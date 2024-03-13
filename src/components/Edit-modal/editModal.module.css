@@ -79,6 +79,10 @@
   letter-spacing: 0em;
 }
 
+.Priorty button:focus {
+  background-color: #b3a9a9;
+}
+
 .footer {
   position: absolute;
   bottom: 8%;
