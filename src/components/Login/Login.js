@@ -46,7 +46,7 @@ const Login = () => {
           localStorage.setItem('authToken', data.data.jwttoken);
           localStorage.setItem('Name', data.data.Name);
           localStorage.setItem('id', data.data.id);
-          navigate('/taskmanager');
+          navigate('/dashboard');
         } else {
           setError(data.data.message);
         }
