@@ -80,50 +80,51 @@ const DashBoard = () => {
   }, [token]);
 
   useEffect(() => {
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-      },
-    };
-    console.log(config);
-    axios
-      .get('https://promanagebackend.onrender.com/api/getalltask', config)
-      .then((res) => {
-        setTasks(res.data);
-        setChecklist(
-          res.data
-            .map((task) => task.checklist.map((item) => ({ ...item })))
-            .flat()
-        );
-        setTaskState(res.data.state);
-      })
-      .catch((err) => console.error(err));
-  }, [taskState]);
-
-  const updateTaskState = async (newState, taskid) => {
-    try {
+    const fetchTasks = async () => {
+      const token = localStorage.getItem('authToken');
       const config = {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${token}`,
         },
       };
-      await axios
-        .put(
-          `https://promanagebackend.onrender.com/api/update-state/${taskid}`,
-          {
-            state: newState,
-          },
+
+      try {
+        const response = await axios.get(
+          'https://promanagebackend.onrender.com/api/getalltask',
           config
-        )
-        .then((response) => {
-          console.log(response.data);
-          setTaskState(response.data.state);
-        });
+        );
+        const tasks = response.data;
+        const checklist = tasks.flatMap((task) => task.checklist);
+        setTasks(tasks);
+        setChecklist(checklist);
+        setTaskState(tasks[0]?.state);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchTasks();
+  }, [taskState, isCheck]);
+
+  const updateTaskState = async (newTaskState, taskId) => {
+    const authToken = localStorage.getItem('authToken');
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`,
+      },
+    };
+
+    try {
+      const response = await axios.put(
+        `https://promanagebackend.onrender.com/api/update-state/${taskId}`,
+        { state: newTaskState },
+        config
+      );
+      setTaskState(response.data.state);
     } catch (error) {
       console.error('Error updating task state:', error);
-      console.log(error.message);
     }
   };
 
@@ -187,23 +188,19 @@ const DashBoard = () => {
 
   const handleCheck = async (taskId, checklistId) => {
     try {
+      const token = localStorage.getItem('authToken');
       const config = {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       };
-      await axios.put(
-        `https://promanagebackend.onrender.com/api/tasks/${taskId}/checklists/${checklistId}`,
-        { ischeck: !isCheck.ischeck },
-        config
-      );
-      setIsCheck((prevState) => {
-        return { ...prevState, ischeck: !prevState.ischeck };
-      });
-      console.log(isCheck);
-    } catch (err) {
-      console.log(err.message);
+      const url = `https://promanagebackend.onrender.com/api/tasks/${taskId}/checklists/${checklistId}`;
+      const updatedChecklist = { ischeck: !isCheck.ischeck };
+      await axios.put(url, updatedChecklist, config);
+      setIsCheck((prevChecklist) => ({
+        ...prevChecklist,
+        ischeck: !prevChecklist.ischeck,
+      }));
+    } catch (error) {
+      console.error('Error toggling checklist:', error.message);
     }
   };
 

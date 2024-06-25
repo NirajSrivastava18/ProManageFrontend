@@ -10,6 +10,8 @@ import {
   faEye,
   faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Registerform = () => {
   const navigate = useNavigate();
@@ -22,6 +24,18 @@ const Registerform = () => {
   const [error, setError] = useState(false);
   const [type, setType] = useState('password');
   const [icon, setIcon] = useState(faEyeSlash);
+  const notify = () => {
+    toast('Register Successfully ✅', {
+      position: 'top-center',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserDetails({ ...userDetails, [name]: value });
@@ -70,6 +84,7 @@ const Registerform = () => {
           localStorage.setItem('Name', JSON.stringify(data.data.Name));
           console.log('User created successfully');
           navigate('/login');
+          notify();
         }
       } catch (error) {
         console.log('something went wrong!');
@@ -180,6 +195,7 @@ const Registerform = () => {
           Login
         </a>
       </div>
+      <ToastContainer />
     </>
   );
 };

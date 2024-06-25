@@ -9,6 +9,8 @@ import {
   faEye,
   faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,6 +21,32 @@ const Login = () => {
   const [error, setError] = useState(false);
   const [type, setType] = useState('password');
   const [icon, setIcon] = useState(faEyeSlash);
+
+  const notify = () => {
+    toast.success('Login Successfully ✅', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
+  };
+
+  const errorMessage = () => {
+    toast.error('Invalid Credentials', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
+  };
   const handleChange = (e) => {
     e.preventDefault();
     setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
@@ -46,13 +74,16 @@ const Login = () => {
           localStorage.setItem('authToken', data.data.jwttoken);
           localStorage.setItem('Name', data.data.Name);
           localStorage.setItem('id', data.data.id);
+          notify();
           navigate('/dashboard');
         } else {
           setError(data.data.message);
+          errorMessage();
         }
       } catch (error) {
         console.log('something went wrong!');
         console.log(error);
+        errorMessage();
       }
     }
   };
@@ -116,6 +147,7 @@ const Login = () => {
           Register
         </a>
       </div>
+      <ToastContainer />
     </>
   );
 };

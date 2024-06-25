@@ -11,21 +11,24 @@ const TaskModal = ({ closeModal }) => {
     priority: 'low',
     dueDate: new Date(),
     user: localStorage.getItem('id'),
-    checklist: [{ text: '', ischecked: false }],
+    checklist: [{ text: '', isChecked: false }],
     state: 'todo',
   });
-  const [errors, setErrors] = useState({});
-  const { title, dueDate, priority, checklist } = formData;
+  const { title, dueDate } = formData;
 
-  const [values, setValues] = useState([{ text: '', ischecked: false }]);
+  const [checkItems, setCheckItems] = useState([
+    { text: '', isChecked: false },
+  ]);
 
-  const handleChange = (e, i) => {
-    if (i !== undefined) {
-      const newValues = [...values];
-      newValues[i].text = e.target.value;
-      newValues[i].ischecked = e.target.checked ? 'true' : 'false';
-      newValues[i].priority = e.target.value;
-      setValues(newValues);
+  const handleChange = (e, index) => {
+    if (index !== undefined) {
+      const updatedCheckItems = [...checkItems];
+      const updatedCheckItem = {
+        ...updatedCheckItems[index],
+        [e.target.name]: e.target.value,
+      };
+      updatedCheckItems[index] = updatedCheckItem;
+      setCheckItems(updatedCheckItems);
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
@@ -42,45 +45,38 @@ const TaskModal = ({ closeModal }) => {
       };
       const response = await axios.post(
         'https://promanagebackend.onrender.com/api/createtask',
-        { ...formData, checklist: values },
+        { ...formData, checklist: checkItems },
         config
       );
-      console.log(response.data);
       window.location.reload();
       closeModal(false);
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ global: error.message });
-      }
+      console.error(error);
     }
   };
 
-  const handleDelete = (e, i) => {
-    e.preventDefault();
-    const newValues = [...values];
-    newValues.splice(i, 1);
-    setValues(newValues);
+  const handleDelete = (index) => {
+    const updatedCheckItems = [...checkItems];
+    updatedCheckItems.splice(index, 1);
+    setCheckItems(updatedCheckItems);
   };
 
-  const handleAdd = (e) => {
-    e.preventDefault();
-    setValues([...values, { text: '', ischecked: false }]);
+  const handleAdd = () => {
+    setCheckItems([...checkItems, { text: '', isChecked: false }]);
   };
 
   return (
     <>
       <div className={styles.modalBackground}>
         <div className={styles.modalContainer}>
-          <form className={styles.modal}>
+          <form className={styles.modal} onSubmit={handleSubmit}>
             <label className={styles.star}>Title</label>
             <input
               type="text"
               name="title"
               placeholder="Enter Task title"
               value={title}
-              onChange={handleChange}
+              onChange={(e) => handleChange(e)}
               required
             />
 
@@ -112,24 +108,23 @@ const TaskModal = ({ closeModal }) => {
               </button>
             </div>
 
-            {/* <h4 className={styles.star}>checklist (0/0)</h4> */}
             <div className={styles.addArea}>
-              {values.map((val, i) => (
-                <div className={styles.addTaskcontainer} key={i}>
+              {checkItems.map((item, index) => (
+                <div className={styles.addTaskcontainer} key={index}>
                   <div className={styles.TaskInput}>
                     <input
                       type="checkbox"
-                      name="ischecked"
-                      checked={val.ischecked}
-                      value={val.ischecked}
+                      name="isChecked"
+                      checked={item.isChecked}
+                      value={item.isChecked}
                       className={styles.addTaskCheckbox}
-                      onChange={(e) => handleChange(e, i)}
+                      onChange={(e) => handleChange(e, index)}
                     />
                     <input
                       type="text"
                       name="text"
-                      value={val.text}
-                      onChange={(e) => handleChange(e, i)}
+                      value={item.text}
+                      onChange={(e) => handleChange(e, index)}
                       placeholder="Add a task"
                       className={styles.addTaskTitle}
                     />
@@ -141,14 +136,14 @@ const TaskModal = ({ closeModal }) => {
                       marginRight: '10px',
                       cursor: 'pointer',
                     }}
-                    onClick={(e) => handleDelete(e, i)}
+                    onClick={() => handleDelete(index)}
                   >
                     <img src={Delete} alt="Delete" />
                   </button>
                 </div>
               ))}
               <button className={styles.addButton} onClick={handleAdd}>
-                + Add New
+                Add New
               </button>
             </div>
 
@@ -167,17 +162,11 @@ const TaskModal = ({ closeModal }) => {
                 <button
                   className={styles.cancel}
                   type="button"
-                  onClick={() => {
-                    closeModal(false);
-                  }}
+                  onClick={() => closeModal(false)}
                 >
                   Cancel
                 </button>
-                <button
-                  className={styles.Save}
-                  type="submit"
-                  onClick={handleSubmit}
-                >
+                <button className={styles.Save} type="submit">
                   Save
                 </button>
               </div>
